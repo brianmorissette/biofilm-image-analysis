@@ -1,0 +1,6 @@
+tifffile
+matplotlib
+imagecodecs
+pandas
+numpy
+sklearn
