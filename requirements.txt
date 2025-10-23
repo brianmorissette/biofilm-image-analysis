@@ -3,4 +3,4 @@ matplotlib
 imagecodecs
 pandas
 numpy
-sklearn
+scikit-learn
