@@ -20,7 +20,7 @@ def display_image(image):
     plt.axis('off')
     plt.show()
 
-def display_grid(images):
+def display_grid_of_images(images):
     grid_size = int(np.ceil(np.sqrt(len(images))))
     plt.figure(figsize=(12, 12))
     for i in range(len(images)):
@@ -35,10 +35,6 @@ release_cells_images = [grayscale(image) for image in load_images('biofilm_data/
 
 print(f"Loaded {len(biofilm_images)} biofilm images from 'biofilm_data/biofilm'")
 print(f"Loaded {len(release_cells_images)} release cells images from 'biofilm_data/release_cells'")
-print(f"Biofilm image shape: {biofilm_images[0].shape}")
-print(f"Release cells image shape: {release_cells_images[0].shape}")
-display_image(biofilm_images[0])
-display_image(release_cells_images[0])
-display_grid(biofilm_images)
-display_grid(release_cells_images)
+display_grid_of_images(biofilm_images)
+display_grid_of_images(release_cells_images)
 
