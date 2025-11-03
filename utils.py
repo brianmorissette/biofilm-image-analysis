@@ -3,24 +3,40 @@ import glob
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+from pathlib import Path
 
 
-def load_images(path):
-    image_files = [os.path.join(path, filename) for filename in os.listdir(path)]
-    return [cv2.imread(file, cv2.IMREAD_UNCHANGED) for file in image_files]
+def load_images(root) -> list[np.ndarray]:
+    # collect all .tif files under `root`, recursively, then sort for stable order
+    paths = sorted(
+        [*Path(root).rglob("*.tif")],
+        key=lambda p: p.as_posix().casefold()
+    )
+    # read each file with cv2 (preserve bit depth/channels) and keep only successful reads
+    return [img for p in paths if (img := cv2.imread(str(p), cv2.IMREAD_UNCHANGED)) is not None]
 
-def grayscale(image):
+def grayscale(image) -> np.ndarray:
     return image[:,:,1]
 
-def normalize(image):
+def normalize(image) -> np.ndarray:
     return image / np.max(image)
 
-def display_image(image):
+def extract_patches(images, patch_size):
+    patches = []
+    for image in images:
+        h, w = image.shape
+        for i in range(h // patch_size):
+            for j in range(w // patch_size):
+                patch = image[i*patch_size:(i+1)*patch_size, j*patch_size:(j+1)*patch_size]
+                patches.append(patch)
+    return patches
+
+def display_image(image) -> None:
     plt.imshow(image)
     plt.axis('off')
     plt.show()
 
-def display_grid_of_images(images):
+def display_grid_of_images(images) -> None:
     grid_size = int(np.ceil(np.sqrt(len(images))))
     plt.figure(figsize=(12, 12))
     for i in range(len(images)):
@@ -29,12 +45,3 @@ def display_grid_of_images(images):
         plt.axis('off')
     plt.tight_layout()
     plt.show()
-
-biofilm_images = [grayscale(image) for image in load_images('biofilm_data/biofilm')]
-release_cells_images = [grayscale(image) for image in load_images('biofilm_data/release_cells')]
-
-print(f"Loaded {len(biofilm_images)} biofilm images from 'biofilm_data/biofilm'")
-print(f"Loaded {len(release_cells_images)} release cells images from 'biofilm_data/release_cells'")
-display_grid_of_images(biofilm_images)
-display_grid_of_images(release_cells_images)
-

@@ -14,56 +14,13 @@ import numpy as np
 import tifffile
 import torch
 from sklearn.model_selection import train_test_split
+from utils import *
 
 
 def match_image_pairs(biofilm_path, release_cells_path):
-    """
-    Match biofilm and release cell images by their XY identifier.
-    
-    Args:
-        biofilm_path: Path to biofilm images folder
-        release_cells_path: Path to release cell images folder
-    
-    Returns:
-        List of tuples (biofilm_filepath, release_cell_filepath) for matched pairs
-    
-    Example:
-        Matches 'Untreated_20x_XY01_Z160_CH2.tif' with 'Untreated_60x_Z160_CH2_XY01.tif'
-        because both contain 'XY01'
-    """
-    print("Matching image pairs by XY identifier...")
-    
-    # Get all tiff files from each folder
-    biofilm_files = sorted(glob.glob(os.path.join(biofilm_path, '*.tif')))
-    release_cell_files = sorted(glob.glob(os.path.join(release_cells_path, '*.tif')))
-    
-    # Create a dictionary to match files by XY identifier
-    # Extract XY number from filenames (e.g., XY01, XY02, etc.)
     paired_images = []
-    
-    for biofilm_file in biofilm_files:
-        # Extract XY identifier from biofilm filename
-        # Example: 'Untreated_20x_XY01_Z160_CH2.tif' -> 'XY01'
-        biofilm_basename = os.path.basename(biofilm_file)
-        xy_id = None
-        for part in biofilm_basename.split('_'):
-            if part.startswith('XY'):
-                xy_id = part
-                break
-        
-        if xy_id is None:
-            print(f"Warning: Could not find XY identifier in {biofilm_basename}")
-            continue
-        
-        # Find matching release cell file
-        for release_cell_file in release_cell_files:
-            release_basename = os.path.basename(release_cell_file)
-            if xy_id in release_basename:
-                paired_images.append((biofilm_file, release_cell_file))
-                print(f"  Matched: {biofilm_basename} <-> {release_basename}")
-                break
-    
-    print(f"Found {len(paired_images)} matched pairs")
+    for (biofilm_file, release_cell_file) in zip(load_images(biofilm_path), load_images(release_cells_path)):
+        paired_images.append((biofilm_file, release_cell_file))
     return paired_images
 
 
@@ -80,27 +37,8 @@ def load_and_convert_to_grayscale(image_path):
     Note:
         Assumes images are RGB where green channel (index 1) contains the data
     """
-    img = tifffile.imread(image_path)
-    # Extract green channel (index 1) for grayscale
-    gray_img = img[:, :, 1]
-    return gray_img
-
-
-def compute_biofilm_label(biofilm_image):
-    """
-    Compute the label for a biofilm image (mean pixel value).
-    
-    Args:
-        biofilm_image: 2D numpy array of grayscale biofilm image
-    
-    Returns:
-        Float value representing the mean pixel value
-    
-    Note:
-        This single value represents the overall biofilm density/intensity
-    """
-    mean_value = np.mean(biofilm_image)
-    return mean_value
+    img = load_images(image_path)
+    return grayscale(img)
 
 
 def extract_patches(image, patch_size=28):
