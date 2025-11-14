@@ -51,6 +51,6 @@ def display_grid_of_images(images) -> None:
 
 def fft_dct(image):
     normalized_image = normalize(image)
-    dct_image = scipy.fft.dctn(normalized_image, norm='ortho')
+    dct_image = scipy.fft.dct(normalized_image)
     dct_df = pd.DataFrame(dct_image)
-    return dct_df.head(), dct_image
+    return dct_df, dct_image
