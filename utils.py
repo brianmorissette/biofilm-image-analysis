@@ -3,6 +3,8 @@ import glob
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.fft
+import pandas as pd
 from pathlib import Path
 
 
@@ -45,3 +47,12 @@ def display_grid_of_images(images) -> None:
         plt.axis('off')
     plt.tight_layout()
     plt.show()
+
+
+def fft_dct(image):
+    normalized_image = normalize(image)
+    dct_image = scipy.fft.dctn(normalized_image, norm='ortho')
+    dct_df = pd.DataFrame(dct_image)
+    return dct_df, dct_image
+
+    
