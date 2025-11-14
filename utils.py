@@ -14,7 +14,7 @@ def load_images(root) -> list[np.ndarray]:
     )
     # read each file with cv2 (preserve bit depth/channels) and keep only successful reads
     return [img for p in paths if (img := cv2.imread(str(p), cv2.IMREAD_UNCHANGED)) is not None]
-
+    
 def grayscale(image) -> np.ndarray:
     return image[:,:,1]
 
@@ -45,3 +45,4 @@ def display_grid_of_images(images) -> None:
         plt.axis('off')
     plt.tight_layout()
     plt.show()
+    
