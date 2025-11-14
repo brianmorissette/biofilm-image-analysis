@@ -54,5 +54,3 @@ def fft_dct(image):
     dct_image = scipy.fft.dctn(normalized_image, norm='ortho')
     dct_df = pd.DataFrame(dct_image)
     return dct_df, dct_image
-
-    
