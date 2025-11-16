@@ -21,14 +21,12 @@ def grayscale(image) -> np.ndarray:
 def normalize(image) -> np.ndarray:
     return image / np.max(image)
 
-def extract_patches(images, patch_size):
+def extract_patches(image, patch_size):
+    h, w = image.shape
     patches = []
-    for image in images:
-        h, w = image.shape
-        for i in range(h // patch_size):
-            for j in range(w // patch_size):
-                patch = image[i*patch_size:(i+1)*patch_size, j*patch_size:(j+1)*patch_size]
-                patches.append(patch)
+    for i in range(h // patch_size):
+        for j in range(w // patch_size):
+            patches.append(image[i*patch_size:(i+1)*patch_size, j*patch_size:(j+1)*patch_size])
     return patches
 
 def display_image(image) -> None:
