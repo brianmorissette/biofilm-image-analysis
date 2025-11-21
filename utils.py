@@ -3,6 +3,8 @@ import glob
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.fft
+import pandas as pd
 from pathlib import Path
 
 
@@ -67,6 +69,17 @@ def preprocess(
     preprocessed_image = cv2.GaussianBlur(normalized_image, blur_ksize, 0)
     return gray_image, enhanced_image, normalized_image, preprocessed_image
 
+def otsu_thresholding(image):
+    optimal_threshold, otsu_mask = cv2.threshold(
+        src=image, 
+        thresh=0,           
+        maxval=255,      
+        type=cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    biofilm_pixels = np.count_nonzero(otsu_mask)
+    total_pixels = otsu_mask.size
+    percent_coverage = (biofilm_pixels / total_pixels) * 100
+    return percent_coverage, otsu_mask, optimal_threshold
+
 def iterative_threshold(image):
     iteration_count = 0
     current_threshold = 127.0
@@ -87,3 +100,40 @@ def iterative_threshold(image):
             mean_fg = np.mean(foreground_pixels)
         current_threshold = (mean_bg + mean_fg) / 2.0
     return int(round(current_threshold)), iteration_count
+
+def biofilm_area(image, pixel_side_length_um=1.13):
+    biofilm_pixels = np.count_nonzero(image)
+    area_per_pixel_um2 = pixel_side_length_um ** 2
+    total_area_um2 = biofilm_pixels * area_per_pixel_um2
+    total_area_mm2 = total_area_um2 / 1_000_000
+    
+    return {
+        'biofilm_pixel_count': biofilm_pixels,
+        'area_per_pixel_um2': area_per_pixel_um2,
+        'total_area_um2': total_area_um2,
+        'total_area_mm2': total_area_mm2
+    }
+
+def analyze_image(image, image_id, pixel_side_length_um=1.13):
+    gray, enhanced, normalized, blurred = preprocess(image)
+
+    otsu_cov, otsu_mask, otsu_thresh = otsu_thresholding(blurred)
+
+    iter_thresh, iter_iters = iterative_threshold(blurred)
+    _, iterative_mask = cv2.threshold(blurred, iter_thresh, 255, cv2.THRESH_BINARY)
+
+    otsu_area = biofilm_area(otsu_mask, pixel_side_length_um)
+    iterative_area = biofilm_area(iterative_mask, pixel_side_length_um)
+
+    return {
+        "image_id": image_id,
+        "otsu_threshold": otsu_thresh,
+        "otsu_percent_coverage": otsu_cov,
+        "otsu_pixel_count": otsu_area["biofilm_pixel_count"],
+        "otsu_area_mm2": otsu_area["total_area_mm2"],
+        "iter_threshold": iter_thresh,
+        "iter_iterations": iter_iters,
+        "iter_percent_coverage": np.count_nonzero(iterative_mask) / iterative_mask.size * 100,
+        "iter_pixel_count": iterative_area["biofilm_pixel_count"],
+        "iter_area_mm2": iterative_area["total_area_mm2"],
+    }
