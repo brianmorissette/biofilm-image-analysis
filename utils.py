@@ -46,7 +46,7 @@ def display_grid_of_images(images) -> None:
     plt.tight_layout()
     plt.show()
 
-
+# Discrete Cosine Transform, you must normalize and grayscale the image before passing it to this function
 def fft_dct(image):
     dct_image = scipy.fft.dct(image)
     return dct_image
