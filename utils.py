@@ -48,7 +48,5 @@ def display_grid_of_images(images) -> None:
 
 
 def fft_dct(image):
-    grayscale_image = grayscale(image)
-    normalized_image = normalize(grayscale_image)
-    dct_image = scipy.fft.dct(normalized_image)
+    dct_image = scipy.fft.dct(image)
     return dct_image
