@@ -73,3 +73,10 @@ def gaussian_transform(image):
     sigma = 2.0
     gaussian_blur = scipy.ndimage.gaussian_filter(image, sigma=sigma)
     return scipy.ndimage.gaussian_laplace(gaussian_blur, sigma=sigma)
+
+def fft_transform(image):
+    fft_image = scipy.fft.fft2(image)
+    mag = np.abs(scipy.fft.fftshift(fft_image))
+    mag = np.log1p(mag)
+    mag = (mag - mag.min()) / (mag.max() - mag.min())      
+    return mag
