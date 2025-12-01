@@ -62,7 +62,14 @@ def mexican_hat_function(size=21, sigma=3.0):
     return kernel / (kernel.sum() if kernel.sum() != 0 else 1.0)
 
 # Function to apply Mexican Hat transform to an image
-def mexhat_transform(image, size=21, sigma=3.0):
+def mexhat_transform(image):
+    size = 21
+    sigma = 3.0
     kernel = mexican_hat_function(size, sigma)
     transformed = scipy.ndimage.convolve(image, kernel, mode='reflect')
     return transformed
+
+def gaussian_transform(image):
+    sigma = 2.0
+    gaussian_blur = scipy.ndimage.gaussian_filter(image, sigma=sigma)
+    return scipy.ndimage.gaussian_laplace(gaussian_blur, sigma=sigma)
