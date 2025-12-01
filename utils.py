@@ -50,3 +50,18 @@ def display_grid_of_images(images) -> None:
 def fft_dct(image):
     dct_image = scipy.fft.dctn(image, type=2, norm='ortho')
     return dct_image
+
+#NOT THE FUNCTION TO CALL MEXICAN HAT, USE mexhat_transform
+def mexican_hat_function(size=21, sigma=3.0):
+    x = np.linspace(-size//2, size//2, size)
+    y = np.linspace(-size//2, size//2, size)
+    X, Y = np.meshgrid(x, y)
+    r2 = X**2 + Y**2
+    kernel = (1 - r2 / (2*sigma**2)) * np.exp(-r2 / (2*sigma**2))
+    return kernel / (kernel.sum() if kernel.sum() != 0 else 1.0)
+
+# Function to apply Mexican Hat transform to an image
+def mexhat_transform(image, size=21, sigma=3.0):
+    kernel = mexican_hat_function(size, sigma)
+    transformed = scipy.ndimage.convolve(image, kernel, mode='reflect')
+    return transformed
