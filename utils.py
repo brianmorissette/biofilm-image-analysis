@@ -3,6 +3,7 @@ import glob
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import pywt
 import scipy.fft
 import pandas as pd
 from pathlib import Path
