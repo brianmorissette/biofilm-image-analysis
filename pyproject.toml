@@ -13,6 +13,7 @@ dependencies = [
     "opencv-python>=4.11.0.86",
     "pandas>=2.3.3",
     "pyarrow>=22.0.0",
+    "pywavelet",
     "pywt",
     "scikit-learn>=1.7.2",
     "tifffile>=2025.5.10",
