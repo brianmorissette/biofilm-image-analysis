@@ -53,7 +53,7 @@ def fft_dct(image):
     return dct_image
 
 #NOT THE FUNCTION TO CALL MEXICAN HAT, USE mexhat_transform
-def mexican_hat_function(size=21, sigma=3.0):
+def mexican_hat_function(size, sigma):
     x = np.linspace(-size//2, size//2, size)
     y = np.linspace(-size//2, size//2, size)
     X, Y = np.meshgrid(x, y)
